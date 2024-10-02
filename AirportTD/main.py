@@ -31,7 +31,7 @@ def create_turret(mouse_pos):
   #attach turret pos to grid
   mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
   mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
-  
+  print(mouse_tile_x, mouse_tile_y)
   #calculate the sequential number of the tile
   mouse_tile_num = (mouse_tile_y * c.COLS) + mouse_tile_x
 
@@ -47,6 +47,7 @@ def create_turret(mouse_pos):
     if tile_free:
       new_turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
       turret_group.add(new_turret)
+      
     
 
  
@@ -79,7 +80,7 @@ while run:
   #draw groups
   enemy_group.draw(screen)
   turret_group.draw(screen)
-  print(turret_group)
+  
 
   #event handler
   for event in pg.event.get():
