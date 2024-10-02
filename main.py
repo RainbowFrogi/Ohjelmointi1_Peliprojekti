@@ -17,14 +17,14 @@ pg.display.set_caption("Tower Defence")
 
 #load images
 #map
-map_image = pg.image.load('AirportTD/levels/level.png').convert_alpha()
+map_image = pg.image.load('levels/level.png').convert_alpha()
 #individual turret image for mouse cursor
-cursor_turret = pg.image.load('AirportTD/assets/images/turrets/cursor_turret.png').convert_alpha()
+cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemies
-enemy_image = pg.image.load('AirportTD/assets/images/enemies/enemy_1.png').convert_alpha()
+enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 
 #load json data for level
-with open('AirportTD/levels/level.tmj') as file:
+with open('levels/level.tmj') as file:
   world_data = json.load(file)
 
 def create_turret(mouse_pos):
