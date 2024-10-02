@@ -1,4 +1,5 @@
 import pygame as pg
+import pygame_textinput
 import json
 from enemy import Enemy
 from world import World
@@ -8,20 +9,33 @@ import constants as c
 #initialise pygame
 pg.init()
 
+#Text input GUI values
+gui_width = 300
+gui_x = c.SCREEN_WIDTH + c.SIDE_PANEL - gui_width
+gui_y = 0
+
+#Create TextInput-object
+textinput = pygame_textinput.TextInputVisualizer()
+
 #create clock
 clock = pg.time.Clock()
 
 #create game window
-screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
+screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT))
 pg.display.set_caption("Tower Defence")
 
-#load images
+#game variables
+
 #map
 map_image = pg.image.load('levels/level.png').convert_alpha()
+#turret spritesheets
+turret_sheet = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
+
 #individual turret image for mouse cursor
 cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemies
 enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
+
 
 #load json data for level
 with open('levels/level.tmj') as file:
@@ -45,12 +59,16 @@ def create_turret(mouse_pos):
 
     #if it is a free space, create turret
     if tile_free:
-      new_turret = Turret(cursor_turret, mouse_tile_x, mouse_tile_y)
+      new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
       turret_group.add(new_turret)
       
     
-
- 
+def select_turret(mouse_pos):
+  mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
+  mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
+  for turret in turret_group:
+      if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
+        return turret
 
 #create world
 world = World(world_data, map_image)
@@ -69,24 +87,43 @@ while run:
 
   clock.tick(c.FPS)
 
-  screen.fill("grey100")
+  #########################
+  # UPDATING SECTION
+  #########################
+
+  #update groups
+  enemy_group.update()
+  turret_group.update()
+
+  #########################
+  # DRAWING SECTION
+  #########################
+
+  screen.fill("white")
 
   #draw level
   world.draw(screen)
 
-  #update groups
-  enemy_group.update()
+  #draw gui
+  pg.draw.rect(screen, "gray", (gui_x, gui_y, gui_width, c.SCREEN_HEIGHT))
 
   #draw groups
   enemy_group.draw(screen)
-  turret_group.draw(screen)
+  for turret in turret_group:
+    turret.draw(screen)
   
+  events = pg.event.get()
+
+  textinput.update(events)
+
+  screen.blit(textinput.surface, (gui_x, c.SCREEN_HEIGHT - 25))
 
   #event handler
-  for event in pg.event.get():
+  for event in events:
     #quit program
     if event.type == pg.QUIT:
       run = False
+      #mouse click
     if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
       mouse_pos = pg.mouse.get_pos()
       #check if mouse is within the world
