@@ -49,6 +49,7 @@ enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 with open('levels/level.tmj') as file:
   world_data = json.load(file)
 
+'''
 def create_turret(mouse_pos):
   #attach turret pos to grid
   mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
@@ -68,7 +69,7 @@ def create_turret(mouse_pos):
     #if it is a free space, create turret
     if tile_free:
       new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
-      turret_group.add(new_turret)
+      turret_group.add(new_turret)'''
 
 def place_turret(x, y):
   world_tile_num = (y * c.COLS) + x
@@ -148,12 +149,6 @@ while run:
     #quit program
     if event.type == pg.QUIT:
       run = False
-      #mouse click
-    if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-      mouse_pos = pg.mouse.get_pos()
-      #check if mouse is within the world
-      if mouse_pos[0] < c.SCREEN_WIDTH and mouse_pos[1] < c.SCREEN_HEIGHT:
-        create_turret(mouse_pos)
 
     if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
       print(f"You entered command {textinput.value} to the command line")
@@ -183,6 +178,8 @@ while run:
             x = int(command_parts[1])
             y = int(command_parts[2])
             if 0 <= x < c.COLS and 0 <= y < c.ROWS:
+              for turret in turret_group:
+                turret.selected = False
               turret = select_turret(x, y)
               if turret:
                 print(f"Selected turret at {x}, {y}")
@@ -192,7 +189,7 @@ while run:
             else:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
           except ValueError:
-            print("Please input the command in a form 'Select x y' e.g. 'Select 10 5' ")
+            print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
           
       textinput.value = ""
     
