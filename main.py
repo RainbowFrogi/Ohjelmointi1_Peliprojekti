@@ -27,7 +27,7 @@ pg.display.set_caption("Tower Defence")
 #game variables
 commands = [
   "createEnemy",
-  "UpgradeSelected",
+  "placeTurret",
   "Select",
   "Place"
 ]
@@ -69,7 +69,32 @@ def create_turret(mouse_pos):
     if tile_free:
       new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
       turret_group.add(new_turret)
-      
+
+def place_turret(x, y):
+  world_tile_num = (y * c.COLS) + x
+
+  if world.tile_map[world_tile_num] == 7:
+    tile_free = True
+    for turret in turret_group:
+      if (x, y) == (turret.tile_x, turret.tile_y):
+        tile_free = False
+
+    if tile_free:
+      new_turret = Turret(turret_sheet, x, y)
+      turret_group.add(new_turret)
+
+'''      
+def parse_command(input_string):
+  command_parts = input_string.split(" ")
+  command = command_parts[0]
+  if command == "placeTurret" and len(command_parts) == 3:
+    try:
+      x = int(command_parts[1])
+      y = int(command_parts[2])
+      if 0 <= 
+'''
+
+
 #Turret selection for upgrading and showing range
 def select_turret(mouse_pos):
   mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
@@ -118,7 +143,7 @@ while run:
   world.draw(screen)
 
   #draw gui
-  pg.draw.rect(screen, "gray", (gui_x, gui_y, gui_width, c.SCREEN_HEIGHT))
+  pg.draw.rect(screen, "grey", (gui_x, gui_y, gui_width, c.SCREEN_HEIGHT))
 
   #draw groups
   enemy_group.draw(screen)
@@ -145,15 +170,26 @@ while run:
 
     if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
       print(f"You entered command {textinput.value} to the command line")
-      if textinput.value in commands:
-        if textinput.value == commands[0]:
-          create_enemy()
-          
-      
+
+      if textinput.value == commands[0]:
+        create_enemy()
+
+      if "placeTurret" in textinput.value:
+        command_parts = textinput.value.split(" ")
+        command = command_parts[0]
+        if len(command_parts) == 3:
+          try:
+            x = int(command_parts[1])
+            y = int(command_parts[2])
+            if 0 <= x < c.COLS and 0 <= y < c.ROWS:
+              place_turret(x, y)
+            else:
+              print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
+          except ValueError:
+            print("Please input in a form 'place' ")
+        
       textinput.value = ""
       
-
-
   #update display
   pg.display.flip()
 
