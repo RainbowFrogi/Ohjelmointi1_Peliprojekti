@@ -28,7 +28,7 @@ pg.display.set_caption("Tower Defence")
 commands = [
   "createEnemy",
   "placeTurret",
-  "Select",
+  "select",
   "Place"
 ]
 
@@ -83,24 +83,11 @@ def place_turret(x, y):
       new_turret = Turret(turret_sheet, x, y)
       turret_group.add(new_turret)
 
-'''      
-def parse_command(input_string):
-  command_parts = input_string.split(" ")
-  command = command_parts[0]
-  if command == "placeTurret" and len(command_parts) == 3:
-    try:
-      x = int(command_parts[1])
-      y = int(command_parts[2])
-      if 0 <= 
-'''
-
-
 #Turret selection for upgrading and showing range
-def select_turret(mouse_pos):
-  mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
-  mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
+def select_turret(x, y):
+
   for turret in turret_group:
-      if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
+      if (x, y) == (turret.tile_x, turret.tile_y):
         return turret
 
 #Create enemy for command testing
@@ -186,9 +173,29 @@ while run:
             else:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
           except ValueError:
-            print("Please input in a form 'place' ")
-        
+            print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
+      
+      if "select" in textinput.value:
+        command_parts = textinput.value.split(" ")
+        command = command_parts[0]
+        if len(command_parts) == 3:
+          try:
+            x = int(command_parts[1])
+            y = int(command_parts[2])
+            if 0 <= x < c.COLS and 0 <= y < c.ROWS:
+              turret = select_turret(x, y)
+              if turret:
+                print(f"Selected turret at {x}, {y}")
+                turret.selected = True
+              else:
+                print("No turret found at that position")
+            else:
+              print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
+          except ValueError:
+            print("Please input the command in a form 'Select x y' e.g. 'Select 10 5' ")
+          
       textinput.value = ""
+    
       
   #update display
   pg.display.flip()
