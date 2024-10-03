@@ -9,13 +9,15 @@ import constants as c
 #initialise pygame
 pg.init()
 
-#Text input GUI values
+#GUI variables
 gui_width = c.COMMANDLINE_PANEL
 gui_x = c.SCREEN_WIDTH
 gui_y = 0
 
 #Create TextInput-object
 textinput = pygame_textinput.TextInputVisualizer()
+#set curosr width
+textinput.cursor_width = 12
 
 #create clock
 clock = pg.time.Clock()
@@ -32,15 +34,14 @@ commands = [
   "Place"
 ]
 
-textinput.cursor_width = 12
+#LOAD IMAGES
 
 #map
 map_image = pg.image.load('levels/level.png').convert_alpha()
-#turret spritesheets
+
+#turret spritesheet
 turret_sheet = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
 
-#individual turret image for mouse cursor
-cursor_turret = pg.image.load('assets/images/turrets/cursor_turret.png').convert_alpha()
 #enemies
 enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 
@@ -49,37 +50,21 @@ enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 with open('levels/level.tmj') as file:
   world_data = json.load(file)
 
-'''
-def create_turret(mouse_pos):
-  #attach turret pos to grid
-  mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
-  mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
-  print(mouse_tile_x, mouse_tile_y)
-  #calculate the sequential number of the tile
-  mouse_tile_num = (mouse_tile_y * c.COLS) + mouse_tile_x
-
-  #check if the tile pressed is grass
-  if world.tile_map[mouse_tile_num] == 7:
-    #check that there isn't already a turret on the tile
-    tile_free = True
-    for turret in turret_group:
-      if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
-        tile_free = False
-
-    #if it is a free space, create turret
-    if tile_free:
-      new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
-      turret_group.add(new_turret)'''
+#FUNCTIONS
 
 def place_turret(x, y):
+  #convert 2D coordinates to 1D
   world_tile_num = (y * c.COLS) + x
-
+  
+  #check if tile on coordinates is a grass tile
   if world.tile_map[world_tile_num] == 7:
     tile_free = True
     for turret in turret_group:
+      #check if tile is already occupied by a turret
       if (x, y) == (turret.tile_x, turret.tile_y):
         tile_free = False
-
+    
+    #if tile is free, place turret and add it to a group
     if tile_free:
       new_turret = Turret(turret_sheet, x, y)
       turret_group.add(new_turret)
@@ -90,6 +75,13 @@ def select_turret(x, y):
   for turret in turret_group:
       if (x, y) == (turret.tile_x, turret.tile_y):
         return turret
+
+def upgrade_turret(turret):
+  pass
+
+def update_groups():
+  enemy_group.update()
+  turret_group.update()
 
 #Create enemy for command testing
 def create_enemy():
@@ -113,13 +105,7 @@ while run:
 
   clock.tick(c.FPS)
 
-  #########################
-  # UPDATING SECTION
-  #########################
-
-  #update groups
-  enemy_group.update()
-  turret_group.update()
+  update_groups()
 
   #########################
   # DRAWING SECTION
@@ -130,39 +116,54 @@ while run:
   #draw level
   world.draw(screen)
 
-  #draw gui
-  pg.draw.rect(screen, "grey", (gui_x, gui_y, gui_width, c.SCREEN_HEIGHT))
+  #draw console panel
+  pg.draw.rect(screen, "grey", (gui_x, gui_y+250, gui_width, c.SCREEN_HEIGHT))
+  #draw GUI panel
+  pg.draw.rect(screen, "purple", (gui_x, gui_y, gui_width, 250))
 
   #draw groups
   enemy_group.draw(screen)
   for turret in turret_group:
     turret.draw(screen)
   
+  #get pygame events
   events = pg.event.get()
 
+  # Update the textinput object
   textinput.update(events)
 
+  # Blit textinput value on screen
   screen.blit(textinput.surface, (gui_x, c.SCREEN_HEIGHT - 25))
-
+  
   #event handler
   for event in events:
     #quit program
     if event.type == pg.QUIT:
       run = False
-
+    
     if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
       print(f"You entered command {textinput.value} to the command line")
+      
+      #deselect all turrets whenever a command is run
+      for turret in turret_group:
+        turret.selected = False
 
+      #check if command is "createEnemy"
       if textinput.value == commands[0]:
         create_enemy()
 
-      if "placeTurret" in textinput.value:
+      #check if command is "placeTurret"
+      if commands[1] in textinput.value:
+        #divide command into parts
         command_parts = textinput.value.split(" ")
+        #get command from parts
         command = command_parts[0]
+        #check if command has 3 parts
         if len(command_parts) == 3:
           try:
             x = int(command_parts[1])
             y = int(command_parts[2])
+            #if coordinates are within window, place turret
             if 0 <= x < c.COLS and 0 <= y < c.ROWS:
               place_turret(x, y)
             else:
@@ -170,16 +171,19 @@ while run:
           except ValueError:
             print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
       
-      if "select" in textinput.value:
+      #check if command is "select"
+      if commands[2] in textinput.value:
+        #divide command into parts
         command_parts = textinput.value.split(" ")
+        #get command from parts
         command = command_parts[0]
+        #check if command has 3 parts
         if len(command_parts) == 3:
           try:
             x = int(command_parts[1])
             y = int(command_parts[2])
+            #if coordinates are within window, select turret
             if 0 <= x < c.COLS and 0 <= y < c.ROWS:
-              for turret in turret_group:
-                turret.selected = False
               turret = select_turret(x, y)
               if turret:
                 print(f"Selected turret at {x}, {y}")
@@ -190,9 +194,9 @@ while run:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
           except ValueError:
             print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
-          
+      
+      #clear console on enter press
       textinput.value = ""
-    
       
   #update display
   pg.display.flip()
