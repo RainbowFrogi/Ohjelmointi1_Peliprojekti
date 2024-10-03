@@ -10,8 +10,8 @@ import constants as c
 pg.init()
 
 #Text input GUI values
-gui_width = 300
-gui_x = c.SCREEN_WIDTH + c.SIDE_PANEL - gui_width
+gui_width = c.COMMANDLINE_PANEL
+gui_x = c.SCREEN_WIDTH
 gui_y = 0
 
 #Create TextInput-object
@@ -21,10 +21,18 @@ textinput = pygame_textinput.TextInputVisualizer()
 clock = pg.time.Clock()
 
 #create game window
-screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT))
+screen = pg.display.set_mode((c.SCREEN_WIDTH + c.COMMANDLINE_PANEL, c.SCREEN_HEIGHT))
 pg.display.set_caption("Tower Defence")
 
 #game variables
+commands = [
+  "createEnemy",
+  "UpgradeSelected",
+  "Select",
+  "Place"
+]
+
+textinput.cursor_width = 12
 
 #map
 map_image = pg.image.load('levels/level.png').convert_alpha()
@@ -62,13 +70,18 @@ def create_turret(mouse_pos):
       new_turret = Turret(turret_sheet, mouse_tile_x, mouse_tile_y)
       turret_group.add(new_turret)
       
-    
+#Turret selection for upgrading and showing range
 def select_turret(mouse_pos):
   mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
   mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
   for turret in turret_group:
       if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
         return turret
+
+#Create enemy for command testing
+def create_enemy():
+  enemy = Enemy(world.waypoints, enemy_image)
+  enemy_group.add(enemy)
 
 #create world
 world = World(world_data, map_image)
@@ -130,7 +143,19 @@ while run:
       if mouse_pos[0] < c.SCREEN_WIDTH and mouse_pos[1] < c.SCREEN_HEIGHT:
         create_turret(mouse_pos)
 
+    if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+      print(f"You entered command {textinput.value} to the command line")
+      if textinput.value in commands:
+        if textinput.value == commands[0]:
+          create_enemy()
+          
+      
+      textinput.value = ""
+      
+
+
   #update display
   pg.display.flip()
 
+print()
 pg.quit()
