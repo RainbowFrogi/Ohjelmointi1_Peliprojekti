@@ -13,10 +13,11 @@ pg.init()
 gui_width = c.COMMANDLINE_PANEL
 gui_x = c.SCREEN_WIDTH
 gui_y = 0
+grid_width = 1
 
 #Create TextInput-object
 textinput = pygame_textinput.TextInputVisualizer()
-#set curosr width
+#set cursor width
 textinput.cursor_width = 12
 
 #create clock
@@ -31,8 +32,11 @@ commands = [
   "createEnemy",
   "placeTurret",
   "select",
-  "Place"
+  "Place",
+  "Grid"
 ]
+
+showgrid = False
 
 #LOAD IMAGES
 
@@ -88,6 +92,17 @@ def create_enemy():
   enemy = Enemy(world.waypoints, enemy_image)
   enemy_group.add(enemy)
 
+#Draw the game grid
+def draw_grid():
+  # draw horizontal lines
+  for i in range(c.ROWS + 1):
+    pg.draw.line(screen, "black", (0, i * c.TILE_SIZE), (c.SCREEN_WIDTH, i * c.TILE_SIZE), grid_width)
+  # draw vertical lines
+  for j in range(c.COLS + 1):
+    pg.draw.line(screen, "black", (j * c.TILE_SIZE, 0), (j * c.TILE_SIZE, c.SCREEN_HEIGHT), grid_width)
+
+
+
 #create world
 world = World(world_data, map_image)
 world.process_data()
@@ -125,7 +140,11 @@ while run:
   enemy_group.draw(screen)
   for turret in turret_group:
     turret.draw(screen)
-  
+
+  #draw grid
+  if showgrid:
+    draw_grid()
+
   #get pygame events
   events = pg.event.get()
 
@@ -194,10 +213,19 @@ while run:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
           except ValueError:
             print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
-      
+
+      #check if command is "Grid"
+      if commands[4] == textinput.value:
+        if showgrid:
+          showgrid = False
+        else:
+          showgrid = True
+
       #clear console on enter press
       textinput.value = ""
-      
+
+
+
   #update display
   pg.display.flip()
 
