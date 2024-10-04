@@ -1,3 +1,5 @@
+import sys
+import mariadb
 import pygame as pg
 import pygame_textinput
 import json
@@ -30,6 +32,21 @@ pg.display.set_caption("Tower Defence")
 pg.font.init()
 font = pg.font.SysFont(None, 36)
 
+'''#initialise mariadb connection
+try:
+    connection = mariadb.connect(
+            user="root",
+            password="root",
+            host="localhost",
+            port=3306,
+            database="towerdefense",
+            autocommit=True
+        )
+    print("Connected to MariaDB turret_defence database")
+except mariadb.Error as e:
+    print(f"Error connecting to MariaDB Platform: {e}")
+    sys.exit(1)
+'''
 #game variables
 commands = [
   "createEnemy",
@@ -93,7 +110,6 @@ def place_turret(x, y,):
 
 #Turret selection for upgrading and showing range
 def select_turret(x, y):
-
   for turret in turret_group:
       if (x, y) == (turret.tile_x, turret.tile_y):
         return turret
