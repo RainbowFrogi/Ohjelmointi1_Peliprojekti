@@ -61,6 +61,8 @@ hearts = 5
 wave = 0
 showgrid = False
 
+showgrid = False
+
 #LOAD IMAGES
 
 #map
