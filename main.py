@@ -26,6 +26,10 @@ clock = pg.time.Clock()
 screen = pg.display.set_mode((c.SCREEN_WIDTH + c.COMMANDLINE_PANEL, c.SCREEN_HEIGHT))
 pg.display.set_caption("Tower Defence")
 
+#initialise font
+pg.font.init()
+font = pg.font.SysFont(None, 36)
+
 #game variables
 commands = [
   "createEnemy",
@@ -33,6 +37,10 @@ commands = [
   "select",
   "Place"
 ]
+
+coins = 100
+hearts = 5
+wave = 0
 
 #LOAD IMAGES
 
@@ -45,6 +53,12 @@ turret_sheet = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha
 #enemies
 enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 
+#ICONS
+#coin icon
+coin_image = pg.image.load('assets/images/gui/coin.png').convert_alpha()
+
+#heart icon
+heart_image = pg.image.load('assets/images/gui/heart.png').convert_alpha()
 
 #load json data for level
 with open('levels/level.tmj') as file:
@@ -52,22 +66,30 @@ with open('levels/level.tmj') as file:
 
 #FUNCTIONS
 
-def place_turret(x, y):
+def console_error_message(message):
+  textinput.value = message
+
+def place_turret(x, y,):
   #convert 2D coordinates to 1D
   world_tile_num = (y * c.COLS) + x
-  
-  #check if tile on coordinates is a grass tile
-  if world.tile_map[world_tile_num] == 7:
-    tile_free = True
-    for turret in turret_group:
-      #check if tile is already occupied by a turret
-      if (x, y) == (turret.tile_x, turret.tile_y):
-        tile_free = False
+  global coins
+  if coins >= 50:
+    #check if tile on coordinates is a grass tile
+    if world.tile_map[world_tile_num] == 7:
+      tile_free = True
+      for turret in turret_group:
+        #check if tile is already occupied by a turret
+        if (x, y) == (turret.tile_x, turret.tile_y):
+          tile_free = False
     
-    #if tile is free, place turret and add it to a group
-    if tile_free:
-      new_turret = Turret(turret_sheet, x, y)
-      turret_group.add(new_turret)
+      #if tile is free, place turret and add it to a group
+      if tile_free:
+        new_turret = Turret(turret_sheet, x, y)
+        coins -= 50
+        turret_group.add(new_turret)
+  else:
+    console_error_message("Not enough coins to place turret")
+  
 
 #Turret selection for upgrading and showing range
 def select_turret(x, y):
@@ -116,10 +138,24 @@ while run:
   #draw level
   world.draw(screen)
 
+  #DRAW PANELS
   #draw console panel
   pg.draw.rect(screen, "grey", (gui_x, gui_y+250, gui_width, c.SCREEN_HEIGHT))
   #draw GUI panel
   pg.draw.rect(screen, "purple", (gui_x, gui_y, gui_width, 250))
+  
+  #DRAW ICONS
+  #draw coin icon to GUI
+  screen.blit(coin_image, (gui_x + 10, 10))
+  #draw coin text to GUI
+  text = font.render(str(coins), True, "white")
+  screen.blit(text, (gui_x + 50, 15))
+  #draw heart icon to GUI
+  screen.blit(heart_image, (gui_x + 10, 50))
+  #draw heart text to GUI
+  text = font.render(str(hearts), True, "white")
+  screen.blit(text, (gui_x + 50, 55))
+
 
   #draw groups
   enemy_group.draw(screen)
