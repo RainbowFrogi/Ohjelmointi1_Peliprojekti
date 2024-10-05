@@ -56,7 +56,8 @@ commands = [
   "placeTurret",
   "select",
   "Place",
-  "Grid"
+  "Grid",
+  "addCoins"
 ]
 coins = 100
 hearts = 5
@@ -222,9 +223,6 @@ while run:
     #quit program
     if event.type == pg.QUIT:
       run = False
-
-    if debugging and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-      coins += 50
     
     if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
       print(f"You entered command {textinput.value} to the command line")
@@ -257,7 +255,7 @@ while run:
             print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
       
       #check if command is "select"
-      if commands[2] in textinput.value:
+      elif commands[2] in textinput.value:
         #divide command into parts
         command_parts = textinput.value.split(" ")
         #get command from parts
@@ -279,6 +277,20 @@ while run:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
           except ValueError:
             print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
+
+      #check if command is "addCoins"
+      elif debugging and commands[5] in textinput.value:
+        #divide command into parts
+        command_parts = textinput.value.split(" ")
+        #get command from parts
+        command = command_parts[0]
+        #check if command has 2 parts
+        if len(command_parts) == 2:
+          try:
+            coins += int(command_parts[1])
+          except ValueError:
+            print("Please input the command in a form 'addCoins x' e.g. 'addCoins 50' ")
+
 
       #check if command is "Grid"
       if commands[4] == textinput.value:
