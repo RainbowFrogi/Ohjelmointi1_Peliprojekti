@@ -16,6 +16,8 @@ gui_width = c.COMMANDLINE_PANEL
 gui_x = c.SCREEN_WIDTH
 gui_y = 0
 grid_width = 1
+grid_color = "black"
+grid_num_color = "black"
 
 #Create TextInput-object
 textinput = pygame_textinput.TextInputVisualizer()
@@ -59,8 +61,6 @@ commands = [
 coins = 100
 hearts = 5
 wave = 0
-showgrid = False
-
 showgrid = False
 
 #LOAD IMAGES
@@ -134,12 +134,21 @@ def create_enemy():
 def draw_grid():
   # draw horizontal lines
   for i in range(c.ROWS + 1):
-    pg.draw.line(screen, "black", (0, i * c.TILE_SIZE), (c.SCREEN_WIDTH, i * c.TILE_SIZE), grid_width)
+    pg.draw.line(screen, grid_color, (0, i * c.TILE_SIZE), (c.SCREEN_WIDTH, i * c.TILE_SIZE), grid_width)
   # draw vertical lines
   for j in range(c.COLS + 1):
-    pg.draw.line(screen, "black", (j * c.TILE_SIZE, 0), (j * c.TILE_SIZE, c.SCREEN_HEIGHT), grid_width)
+    pg.draw.line(screen, grid_color, (j * c.TILE_SIZE, 0), (j * c.TILE_SIZE, c.SCREEN_HEIGHT), grid_width)
 
-
+#Draw grid numbers
+def draw_gridnums():
+  # draw horizontal nums
+  for i in range(c.ROWS):
+    text = font.render(str(i), True, grid_num_color)
+    screen.blit(text, (5, i * c.TILE_SIZE + 5))
+  # draw vertical nums
+  for i in range(c.COLS):
+    text = font.render(str(i), True, grid_num_color)
+    screen.blit(text, (i * c.TILE_SIZE + 5, 5))
 
 #create world
 world = World(world_data, map_image)
@@ -196,6 +205,9 @@ while run:
   #draw grid
   if showgrid:
     draw_grid()
+
+  #draw grid numbers
+  draw_gridnums()
 
   #get pygame events
   events = pg.event.get()
