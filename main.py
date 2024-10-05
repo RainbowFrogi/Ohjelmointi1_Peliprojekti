@@ -33,7 +33,7 @@ pg.display.set_caption("Tower Defence")
 pg.font.init()
 font = pg.font.SysFont(None, 36)
 
-'''#initialise mariadb connection
+#initialise mariadb connection
 try:
     connection = mariadb.connect(
             user="root",
@@ -47,7 +47,7 @@ try:
 except mariadb.Error as e:
     print(f"Error connecting to MariaDB Platform: {e}")
     sys.exit(1)
-'''
+
 #game variables
 commands = [
   "createEnemy",
@@ -60,8 +60,7 @@ coins = 100
 hearts = 5
 wave = 0
 showgrid = False
-
-showgrid = False
+debugging = True
 
 #LOAD IMAGES
 
@@ -211,6 +210,9 @@ while run:
     #quit program
     if event.type == pg.QUIT:
       run = False
+
+    if debugging and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+      coins += 50
     
     if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
       print(f"You entered command {textinput.value} to the command line")
