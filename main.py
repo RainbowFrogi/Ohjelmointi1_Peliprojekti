@@ -55,8 +55,7 @@ commands = [
   "createEnemy",
   "place",
   "select",
-  "Place",
-  "Grid",
+  "grid",
   "addCoins"
 ]
 coins = 100
@@ -90,29 +89,51 @@ with open('levels/level.tmj') as file:
 #FUNCTIONS
 
 def console_error_message(message):
-  textinput.value = message
+  print(message)
 
-def place_turret(x, y,):
-  #convert 2D coordinates to 1D
-  world_tile_num = (y * c.COLS) + x
-  global coins
-  if coins >= 50:
-    #check if tile on coordinates is a grass tile
-    if world.tile_map[world_tile_num] == 7:
-      tile_free = True
-      for turret in turret_group:
-        #check if tile is already occupied by a turret
-        if (x, y) == (turret.tile_x, turret.tile_y):
-          tile_free = False
+def fetch_turret_data(turret_name):
+  try:
+    cursor = connection.cursor()
+    query = "SELECT cooldown, turret_range, damage, cost FROM turrets WHERE name = %s"
+    cursor.execute(query, (turret_name,))
+    turret_data = cursor.fetchone()
+    cursor.close()
+    print(f"Fetched turret data: {turret_data}")
+    return turret_data
+  except mysql.connector.Error as e:
+    print(f"Error fetching turret data: {e}")
+    return None
     
-      #if tile is free, place turret and add it to a group
-      if tile_free:
-        new_turret = Turret(turret_sheet, x, y)
-        coins -= 50
-        turret_group.add(new_turret)
+
+def place_turret(turret_type, x, y):
+  #convert 2D coordinates to 1D
+  global coins
+  world_tile_num = (y * c.COLS) + x
+  turret_data = fetch_turret_data(turret_type)
+  if turret_data:
+    cooldown, turret_range, damage, cost = turret_data
+    if coins >= cost:
+      #check if tile on coordinates is a grass tile
+      if world.tile_map[world_tile_num] == 7:
+        tile_free = True
+        for turret in turret_group:
+          #check if tile is already occupied by a turret
+          if (x, y) == (turret.tile_x, turret.tile_y):
+            tile_free = False
+      
+        #if tile is free, place turret and add it to a group
+        if tile_free:
+          new_turret = Turret(turret_sheet, x, y)
+          coins -= cost
+          turret_group.add(new_turret)
+        else:
+          console_error_message("This tile is already occupied by a turret")
+      else:
+        console_error_message("This tile is not a grass tile")    
+    else:
+      console_error_message("Not enough coins to place turret")
   else:
-    console_error_message("Not enough coins to place turret")
-  
+    console_error_message("Turret data not found")
 
 #Turret selection for upgrading and showing range
 def select_turret(x, y):
@@ -232,34 +253,43 @@ while run:
         turret.selected = False
 
       #check if command is "createEnemy"
-      if textinput.value == commands[0]:
+      if commands[0] in textinput.value:
         create_enemy()
 
       #check if command is "placeTurret"
-      if commands[1] in textinput.value:
+      elif commands[1] in textinput.value:
         #divide command into parts
         command_parts = textinput.value.split(" ")
+        print(f"Command parts: {command_parts}")
         #get command from parts
         command = command_parts[0]
-        #check if command has 3 parts
-        if len(command_parts) == 3:
+        #check if command has 4 parts
+        if len(command_parts) == 4:
           try:
-            x = int(command_parts[1])
-            y = int(command_parts[2])
+            turret_type = command_parts[1]
+            x = int(command_parts[2])
+            y = int(command_parts[3])
             #if coordinates are within window, place turret
             if 0 <= x < c.COLS and 0 <= y < c.ROWS:
-              place_turret(x, y)
+              place_turret(turret_type, x, y)
             else:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
-          except ValueError:
+          except ValueError as e:
+            print(f"ValueError: {e}")
             print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
+        else:
+          print("Invalid command lenght")
+          print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
       
       #check if command is "select"
       elif commands[2] in textinput.value:
         #divide command into parts
         command_parts = textinput.value.split(" ")
+        print(f"Command parts: {command_parts}")
+
         #get command from parts
         command = command_parts[0]
+
         #check if command has 3 parts
         if len(command_parts) == 3:
           try:
@@ -275,11 +305,15 @@ while run:
                 print("No turret found at that position")
             else:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
-          except ValueError:
+          except ValueError as e:
+            print(f"ValueError: {e}")
             print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
+        else:
+          print("Invalid command lenght")
+          print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
 
-      #check if command is "addCoins"
-      elif debugging and commands[5] in textinput.value:
+      #check if command is "addCoins" and debugging is enabled
+      elif debugging and commands[4] in textinput.value:
         #divide command into parts
         command_parts = textinput.value.split(" ")
         #get command from parts
@@ -293,7 +327,7 @@ while run:
 
 
       #check if command is "Grid"
-      if commands[4] == textinput.value:
+      if commands[3] == textinput.value:
         if showgrid:
           showgrid = False
         else:
