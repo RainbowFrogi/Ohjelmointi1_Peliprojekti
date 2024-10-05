@@ -7,7 +7,7 @@ class Turret(pg.sprite.Sprite):
     def __init__(self, sprite_sheet, tile_x, tile_y):
         pg.sprite.Sprite.__init__(self)
         self.range = 90
-        self.cooldown = 1500
+        self.cooldown = 400
         self.last_shot = pg.time.get_ticks()
         self.selected = False
         self.target = None
@@ -27,7 +27,9 @@ class Turret(pg.sprite.Sprite):
         self.update_time = pg.time.get_ticks()
 
         #update image
-        self.image = self.animation_list[self.frame_index]
+        self.angle = 90
+        self.original_image = self.animation_list[self.frame_index]
+        self.image = pg.transform.rotate(self.original_image, self.angle)
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
 
@@ -50,27 +52,30 @@ class Turret(pg.sprite.Sprite):
         return animation_list
     
     def update(self, enemy_group):
-        #search for new target after cooldown
-        if pg.time.get_ticks() - self.last_shot > self.cooldown:
+        #if target picked, play firing animation
+        if self.target:
             self.play_animation()
-            self.pick_target(enemy_group)
+        else:
+            #search for new target after cooldown
+            if pg.time.get_ticks() - self.last_shot > self.cooldown:
+                self.pick_target(enemy_group)
 
     def pick_target(self, enemy_group):
         #find an enemy to target
         x_dist = 0
         y_dist = 0
-        
+        #loop through enemies and find the closest one within range
         for enemy in enemy_group:
             x_dist = enemy.pos[0] - self.x
             y_dist = enemy.pos[1] - self.y
             dist = math.sqrt(x_dist ** 2 + y_dist ** 2)
             if dist < self.range:
                 self.target = enemy
-                print("target acquired")
+                self.angle = math.degrees(math.atan2(-y_dist, x_dist))
 
     def play_animation(self):
         #update image
-        self.image = self.animation_list[self.frame_index]
+        self.original_image = self.animation_list[self.frame_index]
         #check if enough time has passed since the last update
         if pg.time.get_ticks() - self.update_time > c.ANIMATION_DELAY:
             self.update_time = pg.time.get_ticks()
@@ -80,8 +85,12 @@ class Turret(pg.sprite.Sprite):
                 self.frame_index = 0
                 #record completed time and clear target so cooldown can begin
                 self.last_shot = pg.time.get_ticks()
+                self.target = None
     
     def draw(self, surface):
+        self.image = pg.transform.rotate(self.original_image, self.angle - 90)
+        self.rect = self.image.get_rect()
+        self.rect.center = (self.x, self.y)
         surface.blit(self.image, self.rect)
         if self.selected:
             surface.blit(self.range_image, self.range_rect)
