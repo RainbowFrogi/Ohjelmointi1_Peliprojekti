@@ -1,5 +1,5 @@
 import sys
-import mariadb
+import mysql.connector
 import pygame as pg
 import pygame_textinput
 import json
@@ -35,25 +35,25 @@ pg.display.set_caption("Tower Defence")
 pg.font.init()
 font = pg.font.SysFont(None, 36)
 
-#initialise mariadb connection
+#initialise mysql connection
 try:
-    connection = mariadb.connect(
+    connection = mysql.connector.connect(
+            host="localhost",
             user="root",
             password="root",
-            host="localhost",
-            port=3306,
             database="towerdefense",
-            autocommit=True
+            charset='utf8mb4',  # Specify charset
+            collation='utf8mb4_unicode_ci' # Specify collation
         )
-    print("Connected to MariaDB turret_defence database")
-except mariadb.Error as e:
-    print(f"Error connecting to MariaDB Platform: {e}")
+    print("Connected to MySQL turretdefense database")
+except mysql.connector.Error as e:
+    print(f"Error connecting to MySQL Platform: {e}")
     sys.exit(1)
 
 #game variables
 commands = [
   "createEnemy",
-  "placeTurret",
+  "place",
   "select",
   "Place",
   "Grid",
