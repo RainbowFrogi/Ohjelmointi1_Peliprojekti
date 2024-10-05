@@ -203,13 +203,11 @@ while run:
   for turret in turret_group:
     turret.draw(screen)
 
-  #draw grid
+  #draw grid and grid numbers
   if showgrid:
     draw_grid()
-
-  #draw grid numbers
-  draw_gridnums()
-
+    draw_gridnums()
+  
   #get pygame events
   events = pg.event.get()
 
