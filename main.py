@@ -125,7 +125,7 @@ def upgrade_turret(turret):
 
 def update_groups():
   enemy_group.update()
-  turret_group.update()
+  turret_group.update(enemy_group)
 
 #Create enemy for command testing
 def create_enemy():
