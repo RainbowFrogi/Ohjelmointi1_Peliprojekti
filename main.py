@@ -123,7 +123,7 @@ def place_turret(turret_type, x, y):
       
         #if tile is free, place turret and add it to a group
         if tile_free:
-          new_turret = Turret(turret_sheet, x, y)
+          new_turret = Turret(turret_sheet, x, y, cooldown, turret_range, damage)
           coins -= cost
           turret_group.add(new_turret)
         else:

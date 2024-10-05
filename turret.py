@@ -4,10 +4,11 @@ import constants as c
 from pygame.sprite import Group
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, sprite_sheet, tile_x, tile_y):
+    def __init__(self, sprite_sheet, tile_x, tile_y, cooldown, range, damage):
         pg.sprite.Sprite.__init__(self)
-        self.range = 90
-        self.cooldown = 400
+        self.cooldown = cooldown
+        self.range = range
+        self.damage = damage
         self.last_shot = pg.time.get_ticks()
         self.selected = False
         self.target = None
