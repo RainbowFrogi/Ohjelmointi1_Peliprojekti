@@ -64,13 +64,23 @@ wave = 0
 showgrid = False
 debugging = True
 
+TURRET_IMAGE_MAP = {
+  "mk5" : "turret_1",
+  "mk10": "turret_2",
+  "mk15": "turret_3",
+  "mk20": "turret_4"
+}
+
 #LOAD IMAGES
 
 #map
 map_image = pg.image.load('levels/level.png').convert_alpha()
 
-#turret spritesheet
-turret_sheet = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
+#turret spritesheets
+turret_sheet_1 = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
+turret_sheet_2 = pg.image.load('assets/images/turrets/turret_2.png').convert_alpha()
+turret_sheet_3 = pg.image.load('assets/images/turrets/turret_3.png').convert_alpha()
+turret_sheet_4 = pg.image.load('assets/images/turrets/turret_4.png').convert_alpha()
 
 #enemies
 enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
@@ -107,6 +117,7 @@ def fetch_turret_data(turret_name):
 
 def place_turret(turret_type, x, y):
   #convert 2D coordinates to 1D
+  print(turret_type)
   global coins
   world_tile_num = (y * c.COLS) + x
   turret_data = fetch_turret_data(turret_type)
@@ -123,6 +134,8 @@ def place_turret(turret_type, x, y):
       
         #if tile is free, place turret and add it to a group
         if tile_free:
+          turret_sheet_name = TURRET_IMAGE_MAP.get(turret_type)
+          turret_sheet = pg.image.load(f'assets/images/turrets/{turret_sheet_name}.png').convert_alpha()
           new_turret = Turret(turret_sheet, x, y, cooldown, turret_range, damage)
           coins -= cost
           turret_group.add(new_turret)
