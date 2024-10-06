@@ -39,8 +39,8 @@ font = pg.font.SysFont(None, 36)
 try:
     connection = mysql.connector.connect(
             host="localhost",
-            user="root",
-            password="root",
+            user="frogi",
+            password="Frogi123456",
             database="towerdefense",
             charset='utf8mb4',  # Specify charset
             collation='utf8mb4_unicode_ci' # Specify collation
@@ -232,16 +232,15 @@ while run:
   text = font.render(str(hearts), True, "white")
   screen.blit(text, (gui_x + 50, 55))
 
+  #draw grid and grid numbers
+  if showgrid:
+    draw_grid()
+    draw_gridnums()
 
   #draw groups
   enemy_group.draw(screen)
   for turret in turret_group:
     turret.draw(screen)
-
-  #draw grid and grid numbers
-  if showgrid:
-    draw_grid()
-    draw_gridnums()
   
   #get pygame events
   events = pg.event.get()
