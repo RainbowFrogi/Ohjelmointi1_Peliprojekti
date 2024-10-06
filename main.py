@@ -39,8 +39,8 @@ font = pg.font.SysFont(None, 36)
 try:
     connection = mysql.connector.connect(
             host="localhost",
-            user="frogi",
-            password="Frogi123456",
+            user="TDuser",
+            password="1234",
             database="towerdefense",
             charset='utf8mb4',  # Specify charset
             collation='utf8mb4_unicode_ci' # Specify collation
