@@ -213,6 +213,8 @@ def draw_text_log():
     text = font.render(text_log[i][0], True, text_log[i][1])
     screen.blit(text, (gui_x, SCREEN_HEIGHT-50-i * 20))
 
+
+
 #create world
 world = World(world_data, map_image)
 world.process_data()
