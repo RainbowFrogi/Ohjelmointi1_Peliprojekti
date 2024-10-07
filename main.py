@@ -3,6 +3,8 @@ import mysql.connector
 import pygame as pg
 import pygame_textinput
 import json
+
+from constants import SCREEN_HEIGHT
 from enemy import Enemy
 from world import World
 from turret import Turret
@@ -70,6 +72,9 @@ TURRET_IMAGE_MAP = {
   "mk15": "turret_3",
   "mk20": "turret_4"
 }
+
+text_log = [("","red")]
+
 
 #LOAD IMAGES
 
@@ -186,6 +191,28 @@ def draw_gridnums():
     text = font.render(str(i), True, grid_num_color)
     screen.blit(text, (i * c.TILE_SIZE + 5, 5))
 
+#Update text log
+def update_text_log(new_text):
+  # Check if any valid command is present and match color
+  text_log_color = "black"
+  for i in commands:
+    if i in textinput.value:
+      text_log_color = "blue"
+  #stop appending list when it reaches top of UI
+  if len(text_log) <=10:
+    text_log.append(text_log[-1])
+  # move text higher in the list
+  for i in range(1,len(text_log)+1):
+    if i != len(text_log):
+      text_log[-i] = text_log[-(i+1)]
+  # make new first item in list
+  text_log[0] = (new_text,text_log_color)
+
+def draw_text_log():
+  for i in range(len(text_log)):
+    text = font.render(text_log[i][0], True, text_log[i][1])
+    screen.blit(text, (gui_x, SCREEN_HEIGHT-50-i * 20))
+
 #create world
 world = World(world_data, map_image)
 world.process_data()
@@ -236,6 +263,9 @@ while run:
   if showgrid:
     draw_grid()
     draw_gridnums()
+
+  #draw text log
+  draw_text_log()
 
   #draw groups
   enemy_group.draw(screen)
@@ -337,13 +367,15 @@ while run:
           except ValueError:
             print("Please input the command in a form 'addCoins x' e.g. 'addCoins 50' ")
 
-
       #check if command is "Grid"
-      if commands[3] == textinput.value:
+      elif commands[3] == textinput.value:
         if showgrid:
           showgrid = False
         else:
           showgrid = True
+
+      #Update text log list
+      update_text_log(textinput.value)
 
       #clear console on enter press
       textinput.value = ""
