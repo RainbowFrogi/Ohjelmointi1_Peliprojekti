@@ -16,16 +16,18 @@
 
 
 -- Dumping database structure for towerdefense
-DROP DATABASE towerdefense
+DROP DATABASE IF EXISTS towerdefense
 
-CREATE DATABASE towerdefense
+CREATE DATABASE IF NOT EXISTS towerdefense
 
+/*before using the script, create a user with the name of 'TDuser'@'localhost'and password of '1234'*/
+-- CREATE USER 'TDuser'@'localhost' IDENTIFIED BY '1234';
 GRANT SELECT, INSERT, UPDATE, DELETE ON towerdefense.* TO 'TDuser'@'localhost';
 
 FLUSH PRIVILEGES;
 
-CREATE DATABASE IF NOT EXISTS `towerdefense` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
-USE `towerdefense`;
+CREATE DATABASE IF NOT EXISTS towerdefense /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+USE towerdefense;
 
 -- Dumping structure for taulu towerdefense.enemies
 CREATE TABLE IF NOT EXISTS `enemies` (
