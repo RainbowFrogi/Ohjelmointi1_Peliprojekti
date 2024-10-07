@@ -58,7 +58,8 @@ commands = [
   "place",
   "select",
   "grid",
-  "addCoins"
+  "addCoins",
+  "clear"
 ]
 coins = 100
 hearts = 5
@@ -375,6 +376,12 @@ while run:
           showgrid = False
         else:
           showgrid = True
+
+      #check if command is "Grid"
+      if commands[5] in textinput.value:
+        text_log.clear()
+        text_log = [("", "red")]
+        textinput.value = ""
 
       #Update text log list
       update_text_log(textinput.value)
