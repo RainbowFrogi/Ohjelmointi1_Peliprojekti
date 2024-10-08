@@ -54,7 +54,7 @@ except mysql.connector.Error as e:
 
 #game variables
 commands = [
-  "createEnemy",
+  "create",
   "place",
   "select",
   "grid",
@@ -74,10 +74,12 @@ TURRET_IMAGE_MAP = {
   "mk20": "turret_4"
 }
 
-ENEMY_IMAGE_MAP = {
-  "Rogue"  :"enemy_1",
-  "Soldier":"enemy_2",
-  "Tank"   :"enemy_3",
+enemy_images = {
+  "rogue"  : pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha(),
+  "soldier": pg.image.load('assets/images/enemies/enemy_5.png').convert_alpha(),
+  "heavy": pg.image.load('assets/images/enemies/enemy_3.png').convert_alpha(),
+  "elite" : pg.image.load('assets/images/enemies/enemy_4.png').convert_alpha()
+
 }
 
 text_log = [("","red")]
@@ -160,17 +162,36 @@ def select_turret(x, y):
       if (x, y) == (turret.tile_x, turret.tile_y):
         return turret
 
-def upgrade_turret(turret):
-  pass
-
 def update_groups():
   enemy_group.update()
   turret_group.update(enemy_group)
 
-#Create enemy for command testing
-def create_enemy():
-  enemy = Enemy(world.waypoints, enemy_image)
-  enemy_group.add(enemy)
+def fetch_enemy_data(enemy_type):
+  try:
+    cursor = connection.cursor()
+    query = "SELECT speed, damage, health FROM enemies WHERE name = %s"
+    cursor.execute(query, (enemy_type,))
+    enemy_data = cursor.fetchone()
+    cursor.close()
+    print(f"Fetched enemy data: {enemy_data}")
+    return enemy_data
+  except mysql.connector.Error as e:
+    print(f"Error fetching enemy data: {e}")
+    return None
+
+def create_enemy(enemy_type):
+  print(enemy_type)
+  enemy_data = fetch_enemy_data(enemy_type)
+  if enemy_data:
+    
+    speed, damage, health = enemy_data
+    try:
+      enemy = Enemy(enemy_type, world.waypoints, enemy_images, speed, damage, health)
+    except ValueError as e:
+      print(f"Error creating enemy: {e}")
+    enemy_group.add(enemy)
+  else:
+    print("Enemy data not found")
 
 #Draw the game grid
 def draw_grid():
@@ -224,7 +245,8 @@ world.process_data()
 enemy_group = pg.sprite.Group()
 turret_group = pg.sprite.Group()
 
-enemy = Enemy(world.waypoints, enemy_image)
+enemy_type = "soldier"
+enemy = Enemy(enemy_type, world.waypoints, enemy_images)
 enemy_group.add(enemy)
 
 #game loop
@@ -297,9 +319,23 @@ while run:
       for turret in turret_group:
         turret.selected = False
 
-      #check if command is "createEnemy"
+      #check if command is "create"
       if commands[0] in textinput.value:
-        create_enemy()
+        #divide command into parts
+        command_parts = textinput.value.split(" ")
+        print(f"Command parts: {command_parts}")
+        #get command from parts
+        command = command_parts[0]
+        #check if command has 2 parts
+        if len(command_parts) == 2:
+          try:
+            enemy_type = command_parts[1]
+            create_enemy(enemy_type)
+          except ValueError as e:
+            print(f"ValueError: {e}")
+            print("Please input the command in a form 'create enemy' e.g. 'create weak' ")
+
+        create_enemy(enemy_type)
 
       #check if command is "placeTurret"
       elif commands[1] in textinput.value:
