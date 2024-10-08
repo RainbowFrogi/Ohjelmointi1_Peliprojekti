@@ -390,7 +390,6 @@ while run:
       textinput.value = ""
 
 
-
   #update display
   pg.display.flip()
 
