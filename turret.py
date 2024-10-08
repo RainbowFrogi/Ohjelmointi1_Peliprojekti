@@ -4,7 +4,7 @@ import constants as c
 from pygame.sprite import Group
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, sprite_sheet, tile_x, tile_y, cooldown, range, damage):
+    def __init__(self, sprite_sheet, tile_x, tile_y, cooldown, range, damage, shot_fx):
         pg.sprite.Sprite.__init__(self)
         self.cooldown = cooldown
         self.range = range
@@ -20,6 +20,9 @@ class Turret(pg.sprite.Sprite):
         #calculate center coordinates
         self.x = (self.tile_x + 0.5) * c.TILE_SIZE
         self.y = (self.tile_y + 0.5) * c.TILE_SIZE
+
+        #shot sound fx
+        self.shot_fx = shot_fx
 
         #animation variables
         self.sprite_sheet = sprite_sheet
@@ -67,12 +70,18 @@ class Turret(pg.sprite.Sprite):
         y_dist = 0
         #loop through enemies and find the closest one within range
         for enemy in enemy_group:
-            x_dist = enemy.pos[0] - self.x
-            y_dist = enemy.pos[1] - self.y
-            dist = math.sqrt(x_dist ** 2 + y_dist ** 2)
-            if dist < self.range:
-                self.target = enemy
-                self.angle = math.degrees(math.atan2(-y_dist, x_dist))
+            if enemy. health > 0:
+                x_dist = enemy.pos[0] - self.x
+                y_dist = enemy.pos[1] - self.y
+                dist = math.sqrt(x_dist ** 2 + y_dist ** 2)
+                if dist < self.range:
+                    self.target = enemy
+                    self.angle = math.degrees(math.atan2(-y_dist, x_dist))
+                    #damage enemy
+                    self.target.health -= self.damage
+                    #play sound fx
+                    self.shot_fx.play()
+                    break
 
     def play_animation(self):
         #update image
