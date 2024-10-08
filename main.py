@@ -67,6 +67,8 @@ wave = 0
 showgrid = False
 debugging = True
 
+last_enemy_spawn = pg.time.get_ticks()
+
 TURRET_IMAGE_MAP = {
   "mk5" : "turret_1",
   "mk10": "turret_2",
@@ -238,6 +240,7 @@ def draw_text_log():
 #create world
 world = World(world_data, map_image)
 world.process_data()
+world.process_enemies()
 
 #create groups
 enemy_group = pg.sprite.Group()
