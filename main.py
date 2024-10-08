@@ -58,11 +58,9 @@ commands = [
   "place",
   "select",
   "grid",
-  "addCoins",
+  "addMoney",
   "clear"
 ]
-coins = 100
-hearts = 5
 wave = 0
 showgrid = False
 debugging = True
@@ -126,12 +124,11 @@ def fetch_turret_data(turret_name):
 def place_turret(turret_type, x, y):
   #convert 2D coordinates to 1D
   print(turret_type)
-  global coins
   world_tile_num = (y * c.COLS) + x
   turret_data = fetch_turret_data(turret_type)
   if turret_data:
     cooldown, turret_range, damage, cost = turret_data
-    if coins >= cost:
+    if world.money >= cost:
       #check if tile on coordinates is a grass tile
       if world.tile_map[world_tile_num] == 7:
         tile_free = True
@@ -145,14 +142,14 @@ def place_turret(turret_type, x, y):
           turret_sheet_name = TURRET_IMAGE_MAP.get(turret_type)
           turret_sheet = pg.image.load(f'assets/images/turrets/{turret_sheet_name}.png').convert_alpha()
           new_turret = Turret(turret_sheet, x, y, cooldown, turret_range, damage)
-          coins -= cost
+          world.money -= cost
           turret_group.add(new_turret)
         else:
           console_error_message("This tile is already occupied by a turret")
       else:
         console_error_message("This tile is not a grass tile")    
     else:
-      console_error_message("Not enough coins to place turret")
+      console_error_message("Not enough money to place turret")
   else:
     console_error_message("Turret data not found")
 
@@ -163,7 +160,7 @@ def select_turret(x, y):
         return turret
 
 def update_groups():
-  enemy_group.update()
+  enemy_group.update(world)
   turret_group.update(enemy_group)
 
 def fetch_enemy_data(enemy_type):
@@ -277,12 +274,12 @@ while run:
   #draw coin icon to GUI
   screen.blit(coin_image, (gui_x + 10, 10))
   #draw coin text to GUI
-  text = font.render(str(coins), True, "white")
+  text = font.render(str(world.money), True, "white")
   screen.blit(text, (gui_x + 50, 15))
   #draw heart icon to GUI
   screen.blit(heart_image, (gui_x + 10, 50))
   #draw heart text to GUI
-  text = font.render(str(hearts), True, "white")
+  text = font.render(str(world.health), True, "white")
   screen.blit(text, (gui_x + 50, 55))
 
   #draw grid and grid numbers
@@ -300,7 +297,11 @@ while run:
 
   #spawn enemies
   if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
-    enemy = Enemy(enemy_type, world.waypoints, enemy_images)
+    if world.spawned_enemies < len(world.enemy_list):
+      enemy_type = world.enemy_list[world.spawned_enemies]
+      create_enemy(enemy_type)
+      world.spawned_enemies += 1
+      last_enemy_spawn = pg.time.get_ticks()
 
   #get pygame events
   events = pg.event.get()
@@ -342,7 +343,7 @@ while run:
 
         create_enemy(enemy_type)
 
-      #check if command is "placeTurret"
+      #check if command is "place"
       elif commands[1] in textinput.value:
         #divide command into parts
         command_parts = textinput.value.split(" ")
@@ -362,10 +363,10 @@ while run:
               print(f"Please enter a value between 0 and {c.COLS - 1} for x and 0 and {c.ROWS - 1} for y")
           except ValueError as e:
             print(f"ValueError: {e}")
-            print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
+            print("Please input the command in a form 'place turret_name x y' e.g. 'place turret_name 10 5' ")
         else:
           print("Invalid command lenght")
-          print("Please input the command in a form 'placeTurret x y' e.g. 'placeTurret 10 5' ")
+          print("Please input the command in a form 'place turret_name x y' e.g. 'place turret_name 10 5' ")
       
       #check if command is "select"
       elif commands[2] in textinput.value:
@@ -398,7 +399,7 @@ while run:
           print("Invalid command lenght")
           print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
 
-      #check if command is "addCoins" and debugging is enabled
+      #check if command is "addMoney" and debugging is enabled
       elif debugging and commands[4] in textinput.value:
         #divide command into parts
         command_parts = textinput.value.split(" ")
@@ -407,9 +408,9 @@ while run:
         #check if command has 2 parts
         if len(command_parts) == 2:
           try:
-            coins += int(command_parts[1])
+            world.money += int(command_parts[1])
           except ValueError:
-            print("Please input the command in a form 'addCoins x' e.g. 'addCoins 50' ")
+            print("Please input the command in a form 'addMoney x' e.g. 'addMoney 50' ")
 
       #check if command is "Grid"
       elif commands[3] == textinput.value:
