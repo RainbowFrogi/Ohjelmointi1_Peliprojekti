@@ -36,6 +36,8 @@ pg.display.set_caption("Tower Defence")
 #initialise font
 pg.font.init()
 font = pg.font.SysFont(None, 36)
+text_font = pg.font.SysFont("Consolas", 24, bold = True)
+large_font = pg.font.SysFont("Consolas", 36, bold = True)
 
 #initialise mysql connection
 try:
@@ -58,14 +60,20 @@ commands = [
   "place",
   "select",
   "grid",
-  "addMoney",
-  "clear"
+  "addmoney",
+  "clear",
+  "beginwave",
+  "restart"
 ]
 wave = 0
 showgrid = False
 debugging = True
 
 last_enemy_spawn = pg.time.get_ticks()
+
+game_over = False
+game_outcome = 0# -1 = loss, 0 = ongoing, 1 = win
+level_started = False
 
 TURRET_IMAGE_MAP = {
   "mk5" : "turret_1",
@@ -103,6 +111,10 @@ with open('levels/level.tmj') as file:
   world_data = json.load(file)
 
 #FUNCTIONS
+
+def draw_text(text, font, text_color, x, y):
+  img = font.render(text, True, text_color)
+  screen.blit(img, (x, y))
 
 def console_error_message(message):
   print(message)
@@ -145,13 +157,13 @@ def place_turret(turret_type, x, y):
           world.money -= cost
           turret_group.add(new_turret)
         else:
-          console_error_message("This tile is already occupied by a turret")
+          print("This tile is already occupied by a turret")
       else:
-        console_error_message("This tile is not a grass tile")    
+        print("This tile is not a grass tile")    
     else:
-      console_error_message("Not enough money to place turret")
+      print("Not enough money to place turret")
   else:
-    console_error_message("Turret data not found")
+    print("Turret data not found")
 
 #Turret selection for upgrading and showing range
 def select_turret(x, y):
@@ -243,17 +255,23 @@ world.process_enemies()
 enemy_group = pg.sprite.Group()
 turret_group = pg.sprite.Group()
 
-enemy_type = "soldier"
-enemy = Enemy(enemy_type, world.waypoints, enemy_images)
-enemy_group.add(enemy)
-
 #game loop
 run = True
 while run:
 
   clock.tick(c.FPS)
 
-  update_groups()
+  if game_over == False:
+    #check if player has lost
+    if world.health <= 0:
+      game_over = True
+      game_outcome = -1 #loss
+    #check if player has won
+    elif world.level > c.TOTAL_WAVES:
+      game_over = True
+      game_outcome = 1 #won
+
+    update_groups()
 
   #########################
   # DRAWING SECTION
@@ -274,13 +292,13 @@ while run:
   #draw coin icon to GUI
   screen.blit(coin_image, (gui_x + 10, 10))
   #draw coin text to GUI
-  text = font.render(str(world.money), True, "white")
-  screen.blit(text, (gui_x + 50, 15))
+  draw_text(str(world.money), text_font, "white", gui_x + 50, 15)
   #draw heart icon to GUI
   screen.blit(heart_image, (gui_x + 10, 50))
   #draw heart text to GUI
-  text = font.render(str(world.health), True, "white")
-  screen.blit(text, (gui_x + 50, 55))
+  draw_text(str(world.health), text_font, "white", gui_x + 50, 55)
+  #draw wave text to GUI
+  draw_text(f"Wave: {world.level}", text_font, "white", gui_x + 10, 90)
 
   #draw grid and grid numbers
   if showgrid:
@@ -295,13 +313,33 @@ while run:
   for turret in turret_group:
     turret.draw(screen)
 
-  #spawn enemies
-  if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
-    if world.spawned_enemies < len(world.enemy_list):
-      enemy_type = world.enemy_list[world.spawned_enemies]
-      create_enemy(enemy_type)
-      world.spawned_enemies += 1
+  if game_over == False:
+
+    if level_started == True:
+      if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
+        if world.spawned_enemies < len(world.enemy_list):
+          enemy_type = world.enemy_list[world.spawned_enemies]
+          create_enemy(enemy_type)
+          world.spawned_enemies += 1
+          last_enemy_spawn = pg.time.get_ticks()
+    
+    if world.check_wave_complete() == True:
+      world.money += c.WAVE_COMPLETE_REWARD
+      world.level += 1
+      level_started = False
       last_enemy_spawn = pg.time.get_ticks()
+      world.reset_level()
+      world.process_enemies()
+
+  else:
+    pg.draw.rect(screen, "lightblue", (150, 200, 500, 200), border_radius = 30)
+    if game_outcome == -1:
+      draw_text("Game Over", large_font, "red", 300, 250)
+      draw_text("Write 'restart' to play again!", text_font, "black", 200, 300)
+    else:
+      draw_text("You Win!", large_font, "darkgreen", 315, 250)
+      draw_text("Write 'restart' to play again!", text_font, "black", 200, 300)
+
 
   #get pygame events
   events = pg.event.get()
@@ -326,7 +364,7 @@ while run:
         turret.selected = False
 
       #check if command is "create"
-      if commands[0] in textinput.value:
+      if commands[0] in textinput.value and not game_over:
         #divide command into parts
         command_parts = textinput.value.split(" ")
         print(f"Command parts: {command_parts}")
@@ -344,7 +382,7 @@ while run:
         create_enemy(enemy_type)
 
       #check if command is "place"
-      elif commands[1] in textinput.value:
+      elif commands[1] in textinput.value and not game_over:
         #divide command into parts
         command_parts = textinput.value.split(" ")
         print(f"Command parts: {command_parts}")
@@ -369,7 +407,7 @@ while run:
           print("Please input the command in a form 'place turret_name x y' e.g. 'place turret_name 10 5' ")
       
       #check if command is "select"
-      elif commands[2] in textinput.value:
+      elif commands[2] in textinput.value and not game_over:
         #divide command into parts
         command_parts = textinput.value.split(" ")
         print(f"Command parts: {command_parts}")
@@ -399,8 +437,15 @@ while run:
           print("Invalid command lenght")
           print("Please input the command in a form 'select x y' e.g. 'select 10 5' ")
 
+      #check if command is "Grid"
+      elif commands[3] == textinput.value:
+        if showgrid:
+          showgrid = False
+        else:
+          showgrid = True
+
       #check if command is "addMoney" and debugging is enabled
-      elif debugging and commands[4] in textinput.value:
+      elif debugging and commands[4] in textinput.value and not game_over:
         #divide command into parts
         command_parts = textinput.value.split(" ")
         #get command from parts
@@ -412,18 +457,34 @@ while run:
           except ValueError:
             print("Please input the command in a form 'addMoney x' e.g. 'addMoney 50' ")
 
-      #check if command is "Grid"
-      elif commands[3] == textinput.value:
-        if showgrid:
-          showgrid = False
-        else:
-          showgrid = True
-
-      #check if command is "Grid"
-      if commands[5] in textinput.value:
+      #check if command is "clear"
+      elif commands[5] in textinput.value and not game_over:
         text_log.clear()
         text_log = [("", "red")]
         textinput.value = ""
+
+      #check if command is "beginWave" and no enemies are left alive
+      elif commands[6] in textinput.value and not game_over:
+        if len(enemy_group) == 0:
+          level_started = True
+        else:
+          print("There are still enemies on the map")
+      
+      elif commands[7] in textinput.value and game_over:
+        game_over = False
+        level_started = False
+        game_outcome = 0
+        world = World(world_data, map_image)
+        world.process_data()
+        world.process_enemies()
+        enemy_group.empty()
+        turret_group.empty()
+        #empty groups
+        enemy_group.empty()
+        turret_group.empty()
+
+      else:
+        print("Invalid command")
 
       #Update text log list
       update_text_log(textinput.value)
