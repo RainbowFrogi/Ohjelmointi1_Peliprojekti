@@ -75,15 +75,13 @@ TURRET_IMAGE_MAP = {
 }
 
 enemy_images = {
-  "rogue"  : pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha(),
-  "soldier": pg.image.load('assets/images/enemies/enemy_5.png').convert_alpha(),
-  "heavy": pg.image.load('assets/images/enemies/enemy_3.png').convert_alpha(),
+  "rogue"  : pg.image.load('assets/images/enemies/enemy_rogue.png').convert_alpha(),
+  "soldier": pg.image.load('assets/images/enemies/enemy_soldier.png').convert_alpha(),
+  "heavy": pg.image.load('assets/images/enemies/enemy_heavy.png').convert_alpha(),
   "elite" : pg.image.load('assets/images/enemies/enemy_4.png').convert_alpha()
-
 }
 
 text_log = [("","red")]
-
 
 #LOAD IMAGES
 
@@ -333,7 +331,7 @@ while run:
             create_enemy(enemy_type)
           except ValueError as e:
             print(f"ValueError: {e}")
-            print("Please input the command in a form 'create enemy' e.g. 'create weak' ")
+            print("Please input the command in a form 'create enemy' e.g. 'create soldier' ")
 
         create_enemy(enemy_type)
 
