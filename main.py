@@ -81,8 +81,8 @@ game_outcome = 0# -1 = loss, 0 = ongoing, 1 = win
 level_started = False
 
 TURRET_IMAGE_MAP = {
-  "mk5" : "turret_1_custom",
-  "mk10": "turret_2_animation",
+  "mk5" : "turret_1",
+  "mk10": "turret_2",
   "mk15": "turret_3",
   "mk20": "turret_4"
 }
