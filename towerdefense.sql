@@ -14,12 +14,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
--- Dumping database structure for towerdefense
 DROP DATABASE IF EXISTS towerdefense;
-
-CREATE DATABASE IF NOT EXISTS towerdefense;
-
 
 CREATE DATABASE IF NOT EXISTS towerdefense /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
 USE towerdefense;
@@ -38,14 +33,16 @@ CREATE TABLE IF NOT EXISTS `enemies` (
   `damage` int(11) NOT NULL DEFAULT 0,
   `health` int(11) NOT NULL DEFAULT 0,
   `regen` int(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table towerdefense.enemies: ~3 rows (suunnilleen)
+-- Dumping data for table towerdefense.enemies: ~4 rows (suunnilleen)
 INSERT INTO `enemies` (`id`, `name`, `speed`, `damage`, `health`, `regen`) VALUES
 	(1, 'soldier', 1.3, 1, 100, 0),
 	(2, 'heavy', 0.8, 2, 150, 0),
-	(3, 'rogue', 2, 1, 50, 0);
+	(3, 'rogue', 2, 1, 50, 0),
+	(4, 'elite', 1.5, 3, 300, 1);
 
 -- Dumping structure for taulu towerdefense.turrets
 CREATE TABLE IF NOT EXISTS `turrets` (
@@ -58,12 +55,13 @@ CREATE TABLE IF NOT EXISTS `turrets` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
--- Dumping data for table towerdefense.turrets: ~4 rows (suunnilleen)
+-- Dumping data for table towerdefense.turrets: ~5 rows (suunnilleen)
 INSERT INTO `turrets` (`id`, `name`, `cooldown`, `turret_range`, `damage`, `cost`) VALUES
 	(1, 'mk5', 400, 90, 35, 50),
 	(2, 'mk10', 400, 115, 35, 200),
 	(3, 'mk15', 300, 150, 35, 300),
-	(4, 'mk20', 300, 175, 35, 500);
+	(4, 'mk20', 300, 175, 35, 500),
+	(5, 'laser', 0, 175, 1, 400);
 
 -- Dumping structure for taulu towerdefense.users
 CREATE TABLE IF NOT EXISTS `users` (
