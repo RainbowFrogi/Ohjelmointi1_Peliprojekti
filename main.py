@@ -1,4 +1,6 @@
 import sys
+from tkinter.messagebox import showinfo
+
 import mysql.connector
 import pygame as pg
 import pygame_textinput
@@ -20,6 +22,7 @@ gui_y = 0
 grid_width = 1
 grid_color = "black"
 grid_num_color = "black"
+text_log_rows = 15
 
 #Create TextInput-object
 textinput = pygame_textinput.TextInputVisualizer()
@@ -59,17 +62,19 @@ commands = [
   "select",
   "grid",
   "addCoins",
-  "clear"
+  "clear",
+  "info"
 ]
 coins = 100
 hearts = 5
 wave = 0
 showgrid = False
 debugging = True
+showinfo = False
 
 TURRET_IMAGE_MAP = {
-  "mk5" : "turret_1",
-  "mk10": "turret_2",
+  "mk5" : "turret_1_custom",
+  "mk10": "turret_2_animation",
   "mk15": "turret_3",
   "mk20": "turret_4"
 }
@@ -106,6 +111,10 @@ with open('levels/level.tmj') as file:
 
 def console_error_message(message):
   print(message)
+  update_text_log(textinput.value,False)
+  update_text_log(message,True)
+  textinput.value = ""
+
 
 def fetch_turret_data(turret_name):
   try:
@@ -193,14 +202,18 @@ def draw_gridnums():
     screen.blit(text, (i * c.TILE_SIZE + 5, 5))
 
 #Update text log
-def update_text_log(new_text):
-  # Check if any valid command is present and match color
-  text_log_color = "black"
-  for i in commands:
-    if i in textinput.value:
-      text_log_color = "blue"
+def update_text_log(new_text,is_error_message):
+  # turn text red if error message
+  if is_error_message:
+    text_log_color = "red"
+  else:
+    # Check if any valid command is present and match color
+    text_log_color = "black"
+    for i in commands:
+      if i in textinput.value:
+        text_log_color = "blue"
   #stop appending list when it reaches top of UI
-  if len(text_log) <=10:
+  if len(text_log) <= text_log_rows:
     text_log.append(text_log[-1])
   # move text higher in the list
   for i in range(1,len(text_log)+1):
@@ -209,11 +222,15 @@ def update_text_log(new_text):
   # make new first item in list
   text_log[0] = (new_text,text_log_color)
 
+#Draw the text log
 def draw_text_log():
   for i in range(len(text_log)):
     text = font.render(text_log[i][0], True, text_log[i][1])
     screen.blit(text, (gui_x, SCREEN_HEIGHT-50-i * 20))
 
+#draw info screen
+def draw_info_screen():
+  pg.draw.rect(screen,"lightblue",(0,0,c.COLS*c.TILE_SIZE,c.ROWS*c.TILE_SIZE))
 
 
 #create world
@@ -274,7 +291,11 @@ while run:
   enemy_group.draw(screen)
   for turret in turret_group:
     turret.draw(screen)
-  
+
+  #draw info screen on top of map
+  if showinfo:
+    draw_info_screen()
+
   #get pygame events
   events = pg.event.get()
 
@@ -370,25 +391,31 @@ while run:
           except ValueError:
             print("Please input the command in a form 'addCoins x' e.g. 'addCoins 50' ")
 
-      #check if command is "Grid"
+      #check if command is "grid"
       elif commands[3] == textinput.value:
         if showgrid:
           showgrid = False
         else:
           showgrid = True
 
-      #check if command is "Grid"
+      #check if command is "clear"
       if commands[5] in textinput.value:
         text_log.clear()
         text_log = [("", "red")]
         textinput.value = ""
 
+      #check if command is "info"
+      if commands[6] in textinput.value:
+        if showinfo:
+          showinfo = False
+        else:
+          showinfo = True
+
       #Update text log list
-      update_text_log(textinput.value)
+      update_text_log(textinput.value,False)
 
       #clear console on enter press
       textinput.value = ""
-
 
 
   #update display
