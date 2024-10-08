@@ -74,6 +74,12 @@ TURRET_IMAGE_MAP = {
   "mk20": "turret_4"
 }
 
+ENEMY_IMAGE_MAP = {
+  "Rogue"  :"enemy_1",
+  "Soldier":"enemy_2",
+  "Tank"   :"enemy_3",
+}
+
 text_log = [("","red")]
 
 
@@ -81,12 +87,6 @@ text_log = [("","red")]
 
 #map
 map_image = pg.image.load('levels/level.png').convert_alpha()
-
-#turret spritesheets
-turret_sheet_1 = pg.image.load('assets/images/turrets/turret_1.png').convert_alpha()
-turret_sheet_2 = pg.image.load('assets/images/turrets/turret_2.png').convert_alpha()
-turret_sheet_3 = pg.image.load('assets/images/turrets/turret_3.png').convert_alpha()
-turret_sheet_4 = pg.image.load('assets/images/turrets/turret_4.png').convert_alpha()
 
 #enemies
 enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
