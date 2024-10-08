@@ -4,10 +4,10 @@ import sys
 ENEMY_SPAWN_DATA = [
   {
     #1
-    "rogue": 1,
-    "soldier": 2,
-    "heavy": 3,
-    "elite": 4
+    "rogue": 5,
+    "soldier": 0,
+    "heavy": 0,
+    "elite": 0
   },
   {
     #2

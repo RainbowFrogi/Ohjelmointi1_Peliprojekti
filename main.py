@@ -297,7 +297,11 @@ while run:
   enemy_group.draw(screen)
   for turret in turret_group:
     turret.draw(screen)
-  
+
+  #spawn enemies
+  if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
+    enemy = Enemy(enemy_type, world.waypoints, enemy_images)
+
   #get pygame events
   events = pg.event.get()
 
