@@ -106,6 +106,11 @@ coin_image = pg.image.load('assets/images/gui/coin.png').convert_alpha()
 #heart icon
 heart_image = pg.image.load('assets/images/gui/heart.png').convert_alpha()
 
+#load sfx
+shot_fx = pg.mixer.Sound('assets/audio/shot.wav')
+shot_fx.set_volume(0.35)
+
+
 #load json data for level
 with open('levels/level.tmj') as file:
   world_data = json.load(file)
@@ -153,7 +158,7 @@ def place_turret(turret_type, x, y):
         if tile_free:
           turret_sheet_name = TURRET_IMAGE_MAP.get(turret_type)
           turret_sheet = pg.image.load(f'assets/images/turrets/{turret_sheet_name}.png').convert_alpha()
-          new_turret = Turret(turret_sheet, x, y, cooldown, turret_range, damage)
+          new_turret = Turret(turret_sheet, x, y, cooldown, turret_range, damage, shot_fx)
           world.money -= cost
           turret_group.add(new_turret)
         else:

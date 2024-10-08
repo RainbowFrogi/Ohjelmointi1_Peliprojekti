@@ -4,7 +4,7 @@ import constants as c
 from pygame.sprite import Group
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, sprite_sheet, tile_x, tile_y, cooldown, range, damage):
+    def __init__(self, sprite_sheet, tile_x, tile_y, cooldown, range, damage, shot_fx):
         pg.sprite.Sprite.__init__(self)
         self.cooldown = cooldown
         self.range = range
@@ -20,6 +20,9 @@ class Turret(pg.sprite.Sprite):
         #calculate center coordinates
         self.x = (self.tile_x + 0.5) * c.TILE_SIZE
         self.y = (self.tile_y + 0.5) * c.TILE_SIZE
+
+        #shot sound fx
+        self.shot_fx = shot_fx
 
         #animation variables
         self.sprite_sheet = sprite_sheet
@@ -76,6 +79,8 @@ class Turret(pg.sprite.Sprite):
                     self.angle = math.degrees(math.atan2(-y_dist, x_dist))
                     #damage enemy
                     self.target.health -= self.damage
+                    #play sound fx
+                    self.shot_fx.play()
                     break
 
     def play_animation(self):
