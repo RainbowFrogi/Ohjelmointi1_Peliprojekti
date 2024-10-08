@@ -1,6 +1,3 @@
-import sys
-
-
 ENEMY_SPAWN_DATA = [
   {
     #1

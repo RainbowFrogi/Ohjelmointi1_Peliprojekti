@@ -4,7 +4,7 @@ import math
 import constants as c
 
 class Enemy(pg.sprite.Sprite):
-  def __init__(self, enemy_type, waypoints, images, speed = 1, damage = 1, health = 100):
+  def __init__(self, enemy_type, waypoints, images, speed, damage, health):
     pg.sprite.Sprite.__init__(self)
     self.waypoints = waypoints
     self.pos = Vector2(self.waypoints[0])
