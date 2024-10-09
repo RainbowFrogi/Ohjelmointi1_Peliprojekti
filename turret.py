@@ -157,7 +157,3 @@ class Turret(pg.sprite.Sprite):
         # draw laser turret laser
         if self.cooldown == 0 and self.target != None:
             pg.draw.line(surface, "red", (self.x, self.y), (self.target.pos[0], self.target.pos[1]), self.laser_level**2)
-
-            #draw target indicator
-        if self.target:
-            pg.draw.rect(surface, "blue",(self.target.pos[0],self.target.pos[1]+30,20,20))
