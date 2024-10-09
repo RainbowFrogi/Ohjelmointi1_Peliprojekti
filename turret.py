@@ -139,7 +139,7 @@ class Turret(pg.sprite.Sprite):
             self.laser_level += 1
             self.laser_level_progress = 0
         # play sound fx
-        self.shot_fx.play()
+        #self.shot_fx.play()
     
     def draw(self, surface):
         #Check if base turret or laser and rotate image if laser

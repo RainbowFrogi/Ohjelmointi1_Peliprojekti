@@ -1,5 +1,4 @@
 import sys
-from tkinter.messagebox import showinfo
 
 import mysql.connector
 import pygame as pg
@@ -77,9 +76,9 @@ commands = [
   "restart"
 ]
 wave = 0
-showgrid = False
+showgrid = True
 debugging = True
-showinfo = False
+showinfo = True
 
 last_enemy_spawn = pg.time.get_ticks()
 
@@ -125,6 +124,9 @@ coin_image = pg.image.load('assets/images/gui/coin.png').convert_alpha()
 
 #heart icon
 heart_image = pg.image.load('assets/images/gui/heart.png').convert_alpha()
+
+#info screen
+info_image = pg.image.load('assets/images/gui/infoscreen.png').convert_alpha()
 
 #load sfx
 shot_fx = pg.mixer.Sound('assets/audio/shot.wav')
@@ -189,12 +191,16 @@ def place_turret(turret_type, x, y):
           turret_group.add(new_turret)
         else:
           print("This tile is already occupied by a turret")
+          console_error_message("This tile is already occupied by a turret")
       else:
-        print("This tile is not a grass tile")    
+        print("This tile is not a grass tile")
+        console_error_message(f"This tile is not a grass tile")
     else:
       print("Not enough money to place turret")
+      console_error_message(f"Not enough money to place turret")
   else:
     print("Turret data not found")
+    console_error_message("Turret data not found")
 
 #Turret selection for upgrading and showing range
 def select_turret(x, y):
@@ -294,7 +300,9 @@ def draw_text_log():
 #draw info screen
 def draw_info_screen():
   pg.draw.rect(screen,"lightblue",(0,0,c.COLS*c.TILE_SIZE,c.ROWS*c.TILE_SIZE))
+  screen.blit(info_image, (0,0))
 
+  
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                             GAME MANAGEMENT
 #-------------------------------------------------------------------------------------------------------------------------------------------------
