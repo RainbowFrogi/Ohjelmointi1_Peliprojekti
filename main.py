@@ -140,17 +140,9 @@ with open('levels/level.tmj') as file:
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 #                                                             FUNCTIONS
 #-------------------------------------------------------------------------------------------------------------------------------------------------
-def draw_text(text, font, text_color, x, y):
-  img = font.render(text, True, text_color)
-  screen.blit(img, (x, y))
-
-def console_error_message(message):
-  print(message)
-  update_text_log(textinput.value,False)
-  update_text_log(message,True)
-  textinput.value = ""
-
-
+#--------------------------------------------------------------------
+#                           DATABASE FETCH
+#--------------------------------------------------------------------
 def fetch_turret_data(turret_name):
   try:
     cursor = connection.cursor()
@@ -163,8 +155,60 @@ def fetch_turret_data(turret_name):
   except mysql.connector.Error as e:
     print(f"Error fetching turret data: {e}")
     return None
-    
+  
+def fetch_enemy_data(enemy_type):
+  try:
+    cursor = connection.cursor()
+    query = "SELECT speed, damage, health FROM enemies WHERE name = %s"
+    cursor.execute(query, (enemy_type,))
+    enemy_data = cursor.fetchone()
+    cursor.close()
+    print(f"Fetched enemy data: {enemy_data}")
+    return enemy_data
+  except mysql.connector.Error as e:
+    print(f"Error fetching enemy data: {e}")
+    return None
 
+def save_player_data(name, highest_wave, enemies_killed, damage_taken, money):
+  try:
+    cursor = connection.cursor()
+    query = "INSERT INTO users (name, highest_wave, enemies_killed, damage_taken, money) VALUES (%s, %s, %s, %s, %s)"
+    cursor.execute(query, (name, highest_wave, enemies_killed, damage_taken, money))
+    connection.commit()
+    cursor.close()
+    print("Player data saved")
+  except mysql.connector.Error as e:
+    print(f"Error saving player data: {e}")
+
+def get_player_data(name):
+  try:
+    cursor = connection.cursor()
+    query = "SELECT name, highest_wave, enemies_killed, damage_taken, money FROM users"
+    cursor.execute(query)
+    connection.commit()
+    cursor.close()
+    print("Player data saved")
+  except mysql.connector.Error as e:
+    print(f"Error saving player data: {e}")
+
+#--------------------------------------------------------------------
+#                         TEXT FUNCTIONS
+#--------------------------------------------------------------------
+def draw_text(text, font, text_color, x, y):
+  img = font.render(text, True, text_color)
+  screen.blit(img, (x, y))
+
+def console_error_message(message):
+  print(message)
+  update_text_log(textinput.value,False)
+  update_text_log(message,True)
+  textinput.value = ""
+
+
+    
+#--------------------------------------------------------------------
+#                        GAME FUNCTIONALITY
+#--------------------------------------------------------------------
 def place_turret(turret_type, x, y):
   #convert 2D coordinates to 1D
   print(turret_type)
@@ -211,18 +255,6 @@ def update_groups():
   enemy_group.update(game_manager)
   turret_group.update(enemy_group)
 
-def fetch_enemy_data(enemy_type):
-  try:
-    cursor = connection.cursor()
-    query = "SELECT speed, damage, health FROM enemies WHERE name = %s"
-    cursor.execute(query, (enemy_type,))
-    enemy_data = cursor.fetchone()
-    cursor.close()
-    print(f"Fetched enemy data: {enemy_data}")
-    return enemy_data
-  except mysql.connector.Error as e:
-    print(f"Error fetching enemy data: {e}")
-    return None
 
 def create_enemy(enemy_type):
   print(enemy_type)
@@ -238,16 +270,10 @@ def create_enemy(enemy_type):
   else:
     print("Enemy data not found")
 
-def save_player_data(name, highest_wave, enemies_killed, damage_taken, money):
-  try:
-    cursor = connection.cursor()
-    query = "INSERT INTO users (name, highest_wave, enemies_killed, damage_taken, money) VALUES (%s, %s, %s, %s, %s)"
-    cursor.execute(query, (name, highest_wave, enemies_killed, damage_taken, money))
-    connection.commit()
-    cursor.close()
-    print("Player data saved")
-  except mysql.connector.Error as e:
-    print(f"Error saving player data: {e}")
+
+#--------------------------------------------------------------------
+#                           DRAWING
+#--------------------------------------------------------------------
 
 #Draw the game grid
 def draw_grid():
