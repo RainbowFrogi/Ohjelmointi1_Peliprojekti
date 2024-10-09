@@ -119,10 +119,10 @@ enemy_image = pg.image.load('assets/images/enemies/enemy_1.png').convert_alpha()
 
 #ICONS
 #coin icon
-coin_image = pg.image.load('assets/images/gui/coin.png').convert_alpha()
+coin_image = pg.image.load('assets/images/gui/dollar.png').convert_alpha()
 
 #heart icon
-heart_image = pg.image.load('assets/images/gui/heart.png').convert_alpha()
+heart_image = pg.image.load('assets/images/gui/shield.png').convert_alpha()
 
 #info screen
 info_image = pg.image.load('assets/images/gui/infoscreen.png').convert_alpha()
