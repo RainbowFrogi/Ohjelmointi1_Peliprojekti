@@ -3,7 +3,7 @@ import random
 import constants as c
 from enemy_spawn_data import ENEMY_SPAWN_DATA
 
-class World():
+class Game_Manager():
   def __init__(self, data, map_image):
     self.level = 1
     self.money = c.MONEY
