@@ -406,8 +406,6 @@ while run:
             print(f"ValueError: {e}")
             print("Please input the command in a form 'create enemy' e.g. 'create soldier' ")
 
-        create_enemy(enemy_type)
-
       #check if command is "place"
       elif commands[1] in textinput.value and not game_over:
         #divide command into parts
