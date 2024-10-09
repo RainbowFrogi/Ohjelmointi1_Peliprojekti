@@ -84,7 +84,8 @@ TURRET_IMAGE_MAP = {
   "mk5" : "turret_1",
   "mk10": "turret_2",
   "mk15": "turret_3",
-  "mk20": "turret_4"
+  "mk20": "turret_4",
+  "laser": "turret_laser"
 }
 
 enemy_images = {

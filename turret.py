@@ -3,6 +3,7 @@ import pygame as pg
 import constants as c
 from pygame.sprite import Group
 
+
 class Turret(pg.sprite.Sprite):
     def __init__(self, sprite_sheet, tile_x, tile_y, cooldown, range, damage, shot_fx):
         pg.sprite.Sprite.__init__(self)
@@ -12,6 +13,7 @@ class Turret(pg.sprite.Sprite):
         self.last_shot = pg.time.get_ticks()
         self.selected = False
         self.target = None
+        self.laser_level = 1
 
         #position variables
         self.tile_x = tile_x
@@ -64,6 +66,7 @@ class Turret(pg.sprite.Sprite):
             if pg.time.get_ticks() - self.last_shot > self.cooldown:
                 self.pick_target(enemy_group)
 
+
     def pick_target(self, enemy_group):
         #find an enemy to target
         x_dist = 0
@@ -77,8 +80,11 @@ class Turret(pg.sprite.Sprite):
                 if dist < self.range:
                     self.target = enemy
                     self.angle = math.degrees(math.atan2(-y_dist, x_dist))
-                    #damage enemy
-                    self.target.health -= self.damage
+                    #check turret type and damage enemy
+                    if self.cooldown == 0:
+                        self.target.health -= self.damage*self.laser_level*4
+                    else:
+                        self.target.health -= self.damage
                     #play sound fx
                     self.shot_fx.play()
                     break
@@ -96,11 +102,33 @@ class Turret(pg.sprite.Sprite):
                 #record completed time and clear target so cooldown can begin
                 self.last_shot = pg.time.get_ticks()
                 self.target = None
+
+
     
     def draw(self, surface):
-        self.image = pg.transform.rotate(self.original_image, self.angle - 90)
+        #Check if base turret or laser and rotate image if laser
+        if self.cooldown != 0:
+            self.image = pg.transform.rotate(self.original_image, self.angle - 90)
+        else:
+            self.image = self.original_image
+
         self.rect = self.image.get_rect()
         self.rect.center = (self.x, self.y)
         surface.blit(self.image, self.rect)
         if self.selected:
             surface.blit(self.range_image, self.range_rect)
+
+        # draw laser turret laser
+        if self.cooldown == 0 and self.target != None:
+            pg.draw.line(surface, "red", (self.x, self.y), (self.target.pos[0], self.target.pos[1]), 5)
+        #draw laser level
+        if self.cooldown == 0:
+            colors = {
+                1 : "azure",
+                2 : "blue",
+                3 : "orange",
+            }
+            pg.draw.rect(surface,  colors[self.laser_level],(self.x,self.y+30,20,20))
+            #draw target indicator
+            if self.target:
+                pg.draw.rect(surface, colors[self.laser_level],(self.target.pos[0],self.target.pos[1]+30,20,20))
