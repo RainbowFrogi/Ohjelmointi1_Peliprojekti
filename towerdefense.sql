@@ -16,8 +16,9 @@
 
 DROP DATABASE IF EXISTS towerdefense;
 
-CREATE DATABASE IF NOT EXISTS towerdefense /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
-USE towerdefense;
+-- Dumping database structure for towerdefense
+CREATE DATABASE IF NOT EXISTS `towerdefense` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+USE `towerdefense`;
 
 /*before using the script, create a user with the name of 'TDuser'@'localhost'and password of '1234'*/
 -- CREATE USER 'TDuser'@'localhost' IDENTIFIED BY '1234';
@@ -65,10 +66,11 @@ INSERT INTO `turrets` (`id`, `name`, `cooldown`, `turret_range`, `damage`, `cost
 
 -- Dumping structure for taulu towerdefense.users
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL,
-  `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `highest_wave` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
+  `enemies_killed` int(11) NOT NULL,
+  `damage_taken` int(11) NOT NULL,
+  `money` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- Dumping data for table towerdefense.users: ~0 rows (suunnilleen)
