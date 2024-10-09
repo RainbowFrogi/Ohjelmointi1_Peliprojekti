@@ -317,6 +317,8 @@ while run:
 
   # Check if player has won or loss
   if game_over == False:
+    #update groups only if game is not over
+    update_groups()
     # Check if player has lost
     if game_manager.health <= 0:
       game_over = True
@@ -325,8 +327,6 @@ while run:
     elif game_manager.level > c.TOTAL_WAVES:
       game_over = True
       game_outcome = 1 #won
-
-  update_groups()
   #--------------------------------------------------------------------
   #                           SCREEN DRAWING
   #--------------------------------------------------------------------
@@ -542,7 +542,7 @@ while run:
       #if game is over, write anything to save player data with the text input value
       elif game_over and textinput.value != "":
         #save player data
-        player_name = textinput.value 
+        player_name = textinput.value
         highest_wave = game_manager.level
         enemies_killed = game_manager.total_killed_enemies
         damage_taken = c.HEALTH - game_manager.health
@@ -550,8 +550,6 @@ while run:
         save_player_data(player_name, highest_wave, enemies_killed, damage_taken, money)
 
         #restart game
-      
-      elif commands[8] == command and game_over:
         game_over = False
         level_started = False
         game_outcome = 0
@@ -563,6 +561,7 @@ while run:
         #empty groups
         enemy_group.empty()
         turret_group.empty()
+        
       
       elif game_over and textinput.value == "":
         console_error_message("Please enter a player name")
