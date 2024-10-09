@@ -73,8 +73,7 @@ commands = [
   "addmoney",
   "clear",
   "info",
-  "beginwave",
-  "restart"
+  "beginwave"
 ]
 wave = 0
 showgrid = False
