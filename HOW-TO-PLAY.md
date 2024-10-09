@@ -25,13 +25,7 @@ select | Clear from the screen the commands previously used. | ``` select 5 5```
 grid | Clear from the screen the commands previously used. | ``` grid ```
 beginwave | Clear from the screen the commands previously used. | ``` beginwave ```
 
-game_commands = {
-  "create": create_enemy_command,
-  "place": place_turret_command,
-  "select": select_turret_command,
-  "grid": show_grid_command,
-  "beginwave": begin_wave_command
-}
+
 ### [#](#game-over-commands) GAME OVER COMMANDS
 
 **Global commans** can be used at any time.
