@@ -216,6 +216,17 @@ def create_enemy(enemy_type):
   else:
     print("Enemy data not found")
 
+def save_player_data(name, highest_wave, enemies_killed, damage_taken, money):
+  try:
+    cursor = connection.cursor()
+    query = "INSERT INTO users (name, highest_wave, enemies_killed, damage_taken, money) VALUES (%s, %s, %s, %s, %s)"
+    cursor.execute(query, (name, highest_wave, enemies_killed, damage_taken, money))
+    connection.commit()
+    cursor.close()
+    print("Player data saved")
+  except mysql.connector.Error as e:
+    print(f"Error saving player data: {e}")
+
 #Draw the game grid
 def draw_grid():
   # draw horizontal lines
@@ -336,7 +347,6 @@ while run:
     turret.draw(screen)
 
   if game_over == False:
-
     if level_started == True:
       if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
         if world.spawned_enemies < len(world.enemy_list):
@@ -357,12 +367,10 @@ while run:
     pg.draw.rect(screen, "lightblue", (150, 200, 500, 200), border_radius = 30)
     if game_outcome == -1:
       draw_text("Game Over", large_font, "red", 300, 250)
-      draw_text("Write 'restart' to play again!", text_font, "black", 200, 300)
+      draw_text("Write player name to play again!", text_font, "black", 200, 300)
     else:
       draw_text("You Win!", large_font, "darkgreen", 315, 250)
-      draw_text("Write 'restart' to play again!", text_font, "black", 200, 300)
-
-
+      draw_text("Write player name to play again!", text_font, "black", 200, 300)
 
   #draw info screen on top of map
   if showinfo:
@@ -502,8 +510,18 @@ while run:
           level_started = True
         else:
           print("There are still enemies on the map")
-      
-      elif commands[8] in textinput.value and game_over:
+
+      #if game is over, write anything to save player data with the text input value
+      elif game_over and textinput.value != "":
+        #save player data
+        player_name = textinput.value 
+        highest_wave = world.level
+        enemies_killed = world.total_killed_enemies
+        damage_taken = c.HEALTH - world.health
+        money = world.money
+        save_player_data(player_name, highest_wave, enemies_killed, damage_taken, money)
+
+        #restart game
         game_over = False
         level_started = False
         game_outcome = 0
@@ -515,6 +533,9 @@ while run:
         #empty groups
         enemy_group.empty()
         turret_group.empty()
+      
+      elif game_over and textinput.value == "":
+        console_error_message("Please enter a player name")
 
       else:
         print("Invalid command")

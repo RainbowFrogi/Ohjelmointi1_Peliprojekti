@@ -16,6 +16,7 @@ class World():
     self.spawned_enemies = 0
     self.killed_enemies = 0
     self.missed_enemies = 0
+    self.total_killed_enemies = 0
 
   def process_data(self):
     #look through data to extract relevant info
@@ -53,6 +54,7 @@ class World():
     #reset enemy variables
     self.enemy_list = []
     self.spawned_enemies = 0
+    self.total_killed_enemies += self.killed_enemies
     self.killed_enemies = 0
     self.missed_enemies = 0
 
