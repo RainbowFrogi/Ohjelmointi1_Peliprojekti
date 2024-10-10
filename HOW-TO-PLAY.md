@@ -19,11 +19,10 @@ info | Shows you helpful information about the game. Like commands, tower names 
 
 COMMANDS | DESCRIPTION | EXAMPLE
 |-|-|-|
-create | Clear from the screen the commands previously used. | ``` create soldier ```
-place | Clear from the screen the commands previously used. | ``` place mk5 5 5 ```
-select | Clear from the screen the commands previously used. | ``` select 5 5```
-grid | Clear from the screen the commands previously used. | ``` grid ```
-beginwave | Clear from the screen the commands previously used. | ``` beginwave ```
+place | place any turret. | ``` place mk5 5 5 ```
+select | Select any turret to see their range. | ``` select 5 5```
+grid | Show grid. | ``` grid ```
+beginwave | Begins next wave after the last wave is completed. | ``` beginwave ```
 
 
 ### [#](#game-over-commands) GAME OVER COMMANDS
@@ -32,7 +31,7 @@ beginwave | Clear from the screen the commands previously used. | ``` beginwave 
 
 COMMANDS | DESCRIPTION | EXAMPLE
 |-|-|-|
-restart | Restart the game to the First Wave and the player to the default status. | ``` restart ```
+
 
 ## [#](#TURRET) TURRET
 
